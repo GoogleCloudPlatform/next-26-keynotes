@@ -1,0 +1,17 @@
+[project]
+name = "simulator-agent"
+version = "0.1.0"
+description = "Marathon Simulator"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-adk[otel-gcp]==1.28.1",
+    "google-genai>=1.66.0",
+    "python-dotenv>=1.2.2",
+    "opentelemetry-api",
+    "opentelemetry-sdk",
+    "opentelemetry-exporter-gcp-trace",
+    "opentelemetry-exporter-gcp-monitoring",
+    "google-cloud-aiplatform[adk,agent-engines,evaluation]>=1.140.0",
+    "opentelemetry-instrumentation-google-genai>=0.7b0",
+]
