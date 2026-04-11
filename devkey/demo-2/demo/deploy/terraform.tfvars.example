@@ -1,0 +1,19 @@
+# Demo deployment values
+# Copy to terraform.tfvars and fill in your values
+
+project_id = "your-project-id"
+region     = "us-central1"
+
+# Container image — use the same image from the main deployment
+# Find it with: cd ../terraform && terraform output artifact_registry_repository
+image = "us-central1-docker.pkg.dev/your-project-id/orchestrator-agent/orchestrator-agent:latest"
+
+# Service account — reuse from main deployment
+# Find it with: cd ../terraform && terraform output orchestrator_service_account
+service_account_email = "orchestrator-agent@your-project-id.iam.gserviceaccount.com"
+
+# Deployed Agent Engine resource names (same as main terraform.tfvars)
+evaluator_agent_resource_name         = "projects/123456789012/locations/us-central1/reasoningEngines/YOUR_EVALUATOR_ID"
+traffic_planner_agent_resource_name   = "projects/123456789012/locations/us-central1/reasoningEngines/YOUR_TRAFFIC_PLANNER_ID"
+community_planner_agent_resource_name = "projects/123456789012/locations/us-central1/reasoningEngines/YOUR_COMMUNITY_PLANNER_ID"
+economic_planner_agent_resource_name  = "projects/123456789012/locations/us-central1/reasoningEngines/YOUR_ECONOMIC_PLANNER_ID"
