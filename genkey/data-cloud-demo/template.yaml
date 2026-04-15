@@ -1,0 +1,29 @@
+labels:
+ client: "vscode"
+ jupyterSession:
+ displayName: "iceberg-federation-template"
+ kernel: "PYTHON"
+ environmentConfig:
+ executionConfig:
+   serviceAccount: "sa-spark-dev1@<PROJECT_ID>.iam.gserviceaccount.com"
+   subnetworkUri: "<SUBNETWORK_NAME>"
+ runtimeConfig:
+ version: "2.3"
+ properties:
+ # This enables the secure proxy URL you were looking for
+   dataproc.tier: "premium"
+   spark.dataproc.engine: "lightningEngine"
+   spark.dataproc.lightningEngine.runtime: "native"
+   spark.memory.offHeap.enabled: "true"
+   spark.memory.offHeap.size: "1g"
+   spark.executor.memory: "4g"
+   spark.sql.extensions: "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+   "dataproc.component.gateway.enabled": "true"
+   "dataproc.jupyter.listen.all.interfaces": "true"
+   "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+   "spark.sql.defaultCatalog": "<CATALOG_NAME>"
+   "spark.sql.catalog.<CATALOG_NAME>": "org.apache.iceberg.spark.SparkCatalog"
+   "spark.sql.catalog.<CATALOG_NAME>.type": "rest"
+   "spark.sql.catalog.<CATALOG_NAME>.uri": "<CATALOG_URI_ID>"
+   "spark.sql.catalog.<CATALOG_NAME>.warehouse": "bl://projects/<PROJECT_ID>/catalogs/<CATALOG_NAME>"
+   "spark.sql.catalog.<CATALOG_NAME>.rest.auth.type": "org.apache.iceberg.gcp.auth.GoogleAuthManager"
