@@ -14,8 +14,8 @@ files = [
 ]
 
 # 1. CRITICAL: Create the namespace first
-# This maps to the BigQuery dataset. You can replace the dataset (acai_dataset) to whatever you want.
-# But make sure to reference the same in line 31.
+# This maps to the BigQuery dataset. You can replace the dataset (acai_dataset) to whatever you want. But make sure to reference the same in line 31. 
+# In any case, it creates a namespace in the name of the catalog. So in your BigQuery editor, you will reference the object in the format: Namespace.Dataset.Table
 
 spark.sql("CREATE NAMESPACE IF NOT EXISTS acai_dataset")
 
