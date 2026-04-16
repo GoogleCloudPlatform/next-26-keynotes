@@ -14,10 +14,10 @@ files = [
 ]
 
 # 1. CRITICAL: Create the namespace first
-# This maps to the BigQuery dataset. You can replace the namespace name (acai_data) and dataset (acai_dataset) to whatever you want.
+# This maps to the BigQuery dataset. You can replace the dataset (acai_dataset) to whatever you want.
 # But make sure to reference the same in line 31.
 
-spark.sql("CREATE NAMESPACE IF NOT EXISTS acai_data.acai_dataset")
+spark.sql("CREATE NAMESPACE IF NOT EXISTS acai_dataset")
 
 # Loop through and register each as an Iceberg table in BigLake
 for file_name in files:
@@ -28,13 +28,17 @@ for file_name in files:
 
    # 3. Write to the catalog.
   # Note: Use .tableProperty inside the writeTo chain correctly
-  df.writeTo(f"acai_data.acai_dataset.{file_name}") \
+  df.writeTo(f"acai_dataset.{file_name}") \
       .using("iceberg") \
       .tableProperty("write.format.default", "parquet") \
       .createOrReplace()
 
 
 print("All tables registered successfully!")
+
+
+# Verify one table
+#spark.sql("SELECT * FROM acaibucket.acai_dataset.order_items LIMIT 5").show()
 
 
 # Verify one table
