@@ -39,7 +39,3 @@ print("All tables registered successfully!")
 
 # Verify one table
 #spark.sql("SELECT * FROM acaibucket.acai_dataset.order_items LIMIT 5").show()
-
-
-# Verify one table
-#spark.sql("SELECT * FROM acaibucket.acai_dataset.order_items LIMIT 5").show()
