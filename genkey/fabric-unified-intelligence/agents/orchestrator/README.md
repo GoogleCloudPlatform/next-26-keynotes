@@ -76,6 +76,40 @@ To add CI/CD and Terraform, run `uvx agent-starter-pack enhance`.
 To set up your production infrastructure, run `uvx agent-starter-pack setup-cicd`.
 See the [deployment guide](https://googlecloudplatform.github.io/agent-starter-pack/guide/deployment) for details.
 
+## BQ Data Agent Configuration
+
+The orchestrator queries a **BigQuery Conversational Analytics Data Agent** for
+internal data analysis (product catalog, inventory, dead stock, etc.).
+
+### Prerequisites
+
+1. Enable the required APIs in your project:
+   ```bash
+   gcloud services enable geminidataanalytics.googleapis.com \
+                          cloudaicompanion.googleapis.com
+   ```
+2. Create a data agent in the
+   [BigQuery Agents Hub](https://console.cloud.google.com/bigquery/agents_hub)
+   with your product catalog tables as knowledge sources, then **Publish** it.
+3. Grant the orchestrator's service account the following roles:
+   - `roles/geminidataanalytics.dataAgentUser`
+   - `roles/geminidataanalytics.dataAgentStatelessUser`
+   - `roles/bigquery.dataViewer` on the source tables
+
+### Environment variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `BQ_DATA_AGENT_PROJECT` | Yes | Google Cloud project ID that hosts the data agent |
+| `BQ_DATA_AGENT_ID` | Yes | Data agent ID (e.g. `agent_12e0f70f-...`). Found in the agent URL path in the Agents Hub |
+| `BQ_DATA_AGENT_LOCATION` | No | Defaults to `global` |
+
+Example `.env`:
+```
+BQ_DATA_AGENT_PROJECT=my-project-id
+BQ_DATA_AGENT_ID=agent_12e0f70f-a0f9-4532-b8fc-e3f5deecf60b
+```
+
 ## Observability
 
 Built-in telemetry exports to Cloud Trace, BigQuery, and Cloud Logging.

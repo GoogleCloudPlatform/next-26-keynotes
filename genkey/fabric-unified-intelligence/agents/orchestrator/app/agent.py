@@ -183,24 +183,24 @@ async def _extract_token(tool_context: ToolContext) -> str | None:
 
 
 def _call_data_insight_agent_sync(query: str, access_token: str) -> str:
-    """Calls the Data Insight Agent using a pre-resolved access token.
+    """Calls the BQ Data Agent via the Conversational Analytics API.
+
+    Uses the geminidataanalytics.googleapis.com/v1beta :chat endpoint
+    in stateless mode (data_agent_context).
 
     This function is safe to call from any thread since it only uses
     primitive string arguments and makes a standalone HTTP request.
     """
 
-    project_id = os.environ.get("DATA_INSIGHT_AGENT_PROJECT")
-    app_id = os.environ.get("DATA_INSIGHT_APP_ID")
-    agent_id = os.environ.get("DATA_INSIGHT_AGENT_ID")
-    project_number = os.environ.get("DATA_INSIGHT_PROJECT_NUMBER")
+    project_id = os.environ.get("BQ_DATA_AGENT_PROJECT")
+    data_agent_id = os.environ.get("BQ_DATA_AGENT_ID")
+    location = os.environ.get("BQ_DATA_AGENT_LOCATION", "global")
 
     missing = [
         name
         for name, val in [
-            ("DATA_INSIGHT_AGENT_PROJECT", project_id),
-            ("DATA_INSIGHT_APP_ID", app_id),
-            ("DATA_INSIGHT_AGENT_ID", agent_id),
-            ("DATA_INSIGHT_PROJECT_NUMBER", project_number),
+            ("BQ_DATA_AGENT_PROJECT", project_id),
+            ("BQ_DATA_AGENT_ID", data_agent_id),
         ]
         if not val
     ]
@@ -208,87 +208,70 @@ def _call_data_insight_agent_sync(query: str, access_token: str) -> str:
         return f"Error: Missing required environment variables: {', '.join(missing)}"
 
     api_endpoint = (
-        f"https://discoveryengine.googleapis.com/v1alpha/projects/{project_number}"
-        f"/locations/global/collections/default_collection/engines/{app_id}"
-        f"/assistants/default_assistant:streamAssist"
+        f"https://geminidataanalytics.googleapis.com/v1beta/"
+        f"projects/{project_id}/locations/{location}:chat"
     )
 
     headers = {
         "Authorization": f"Bearer {access_token}",
         "Content-Type": "application/json",
-        "X-Goog-User-Project": project_id,
+        "x-server-timeout": "300",
     }
 
-    logger.debug("Data Insight Agent request headers (token redacted): %s",
+    logger.debug("BQ Data Agent request headers (token redacted): %s",
                  {k: (v[:20] + '...') if k == 'Authorization' else v
                   for k, v in headers.items()})
 
     payload = {
-        "query": {"text": query},
-        "agentsSpec": {"agentSpecs": [{"agentId": agent_id}]},
-        "answerGenerationMode": "AGENT",
+        "parent": f"projects/{project_id}/locations/{location}",
+        "messages": [{"userMessage": {"text": query}}],
+        "data_agent_context": {
+            "data_agent": (
+                f"projects/{project_id}/locations/{location}"
+                f"/dataAgents/{data_agent_id}"
+            ),
+        },
     }
 
     try:
-        response = requests.post(api_endpoint, headers=headers, json=payload, timeout=120)
+        response = requests.post(
+            api_endpoint, headers=headers, json=payload, timeout=300
+        )
         response.raise_for_status()
 
         data = response.json()
-        if isinstance(data, list) and len(data) > 0:
-            # The streaming API returns chunks in order; the last chunk
-            # with an "answer" key contains the final, most complete
-            # response.  We scan from the end to find it efficiently.
-            for chunk in reversed(data):
-                if "answer" not in chunk:
-                    continue
-                answer = chunk["answer"]
 
-                # Check if the agent requires user OAuth authorization.
-                if "requiredAuthorizations" in answer:
-                    auths = answer["requiredAuthorizations"]
-                    if auths:
-                        auth_uri = auths[0].get("authorizationUri", "")
-                        return (
-                            "The Data Insight Agent requires authorization to proceed. "
-                            f"Please visit this URL to authenticate: {auth_uri}"
-                        )
+        # The CA API streams back an array of JSON chunks.  Each chunk
+        # may contain an "agentMessage" with a "text" field.  We collect
+        # all text fragments and join them.
+        collected_texts: list[str] = []
 
-                # --- Extract content from this chunk (try each source) ---
-                collected_texts: list[str] = []
+        if isinstance(data, list):
+            for chunk in data:
+                # Primary: agentMessage.text
+                agent_msg = chunk.get("agentMessage", {})
+                if "text" in agent_msg:
+                    collected_texts.append(agent_msg["text"])
 
-                # 1. Grounded reply text parts (primary source).
-                for reply in answer.get("replies", []):
-                    content = reply.get("groundedContent", {}).get(
-                        "content", {}
-                    )
-                    for part in content.get("parts", []):
-                        if "text" in part:
-                            collected_texts.append(part["text"])
-                    # Fallback: top-level text on the content object.
-                    if not collected_texts and "text" in content:
-                        collected_texts.append(content["text"])
+                # Fallback: look for nested content parts
+                for part in agent_msg.get("content", {}).get("parts", []):
+                    if "text" in part:
+                        collected_texts.append(part["text"])
+        elif isinstance(data, dict):
+            # Non-streaming single response
+            agent_msg = data.get("agentMessage", {})
+            if "text" in agent_msg:
+                collected_texts.append(agent_msg["text"])
 
-                # 2. Structured content fallback (charts, Vega-Lite, etc.)
-                #    Only used when no grounded text was found.
-                if not collected_texts:
-                    for reply in answer.get("replies", []):
-                        structured = reply.get("structuredContent")
-                        if structured:
-                            try:
-                                collected_texts.append(_json.dumps(structured))
-                            except (TypeError, ValueError):
-                                collected_texts.append(str(structured))
-
-                # Return the first chunk that yielded content.
-                if collected_texts:
-                    return "\n".join(collected_texts)
+        if collected_texts:
+            return "\n".join(collected_texts)
 
         return (
-            "The Data Insight Agent returned an empty response. "
+            "The BQ Data Agent returned an empty response. "
             "It might lack the necessary data for this query."
         )
     except requests.exceptions.RequestException as e:
-        return f"Error communicating with Data Insight Agent: {e}"
+        return f"Error communicating with BQ Data Agent: {e}"
 
 
 async def query_data_insight_agent(query: str, tool_context: ToolContext) -> str:
