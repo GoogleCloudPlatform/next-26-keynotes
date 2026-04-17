@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Architecture Diagram - Hypercomputer</title>
+    <style>
+        body { font-family: sans-serif; margin: 0; padding: 20px; background-color: #f4f4f9; display: flex; flex-direction: column; align-items: center; }
+        .mermaid { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 1200px; overflow-x: auto; }
+        h1 { color: #333; margin-bottom: 20px; }
+        .back-btn { margin-bottom: 20px; align-self: flex-start; text-decoration: none; color: #007bff; font-weight: bold; }
+        .back-btn:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">&larr; Back to Chat</a>
+    <h1>System Architecture</h1>
+    <div class="mermaid">
+    graph TD
+        subgraph Local_Workstation
+            Dev[Developer]
+            TF[Terraform CLI]
+            Code[Source Code]
+        end
+
+        subgraph GCP
+            subgraph Build_Artifacts
+                CB[Cloud Build]
+                AR[Artifact Registry]
+            end
+
+            subgraph Storage
+                GCS[GCS Bucket]
+            end
+
+            subgraph GKE_Cluster
+                LB[Load Balancer]
+                
+                subgraph App_Pod
+                    UI[Chat UI Container]
+                end
+                
+                subgraph GPU_Pod
+                    VLLM_SVC[vllm Service]
+                    VLLM[vLLM Server]
+                end
+            end
+        end
+
+        Dev -->|1. Edit Code| Code
+        Dev -->|2. Update Version & Apply| TF
+        TF -->|3. Triggers Build| CB
+        Code -.->|Source| CB
+        CB -->|4. Push Image| AR
+        TF -->|5. Update Deployment| UI
+        
+        User((User)) -->|HTTP| LB
+        LB --> UI
+        UI -->|Internal API| VLLM_SVC
+        VLLM_SVC --> VLLM
+        
+        VLLM -->|Mounts Weights| GCS
+        UI -.->|Pulls Image| AR
+        VLLM -.->|Pulls vLLM Image| AR
+    </div>
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</body>
+</html>
