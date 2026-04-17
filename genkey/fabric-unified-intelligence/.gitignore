@@ -27,5 +27,5 @@ Thumbs.db
 # Secrets / credentials
 *.json
 !*.schema.json
-.env*
 !.env.sample
+.env
