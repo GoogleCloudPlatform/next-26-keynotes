@@ -1,0 +1,14 @@
+# Project-specific values for the Next 26 demo
+# Copy this file to terraform.tfvars and fill in your values
+
+project_id     = "your-project-id"
+project_number = "123456789012"
+region         = "us-central1"
+bucket_name    = "your-project-id-agent-staging"
+
+# Deployed Agent Engine resource names (update after deploying each agent)
+evaluator_agent_resource_name                = "projects/123456789012/locations/us-central1/reasoningEngines/YOUR_EVALUATOR_ID"
+simulator_agent_resource_name    = "projects/123456789012/locations/us-central1/reasoningEngines/YOUR_SIMULATION_CONTROLLER_ID"
+
+# Allow unauthenticated access to Cloud Run service (for demo)
+allow_unauthenticated = true
