@@ -6,9 +6,10 @@
 > 3. [Global Rules](#global-rules)
 > 4. [Dev Agent Protocols](#dev-agent-protocols)
 > 5. [Senior Full Stack Engineer Protocols](#senior-full-stack-engineer-protocols)
-> 6. [Containerized Frontend Best Practices](#containerized-frontend-best-practices)
-> 7. [Self-Correction Protocols](#self-correction-protocols)
-> 8. [Troubleshooting & Error Handling](#troubleshooting--error-handling)
+> 6. [Design Specification — Organic Living](#design-specification--organic-living)
+> 7. [Containerized Frontend Best Practices](#containerized-frontend-best-practices)
+> 8. [Self-Correction Protocols](#self-correction-protocols)
+> 9. [Troubleshooting & Error Handling](#troubleshooting--error-handling)
 
 ---
 
@@ -96,7 +97,7 @@ These rules apply across **all modes**:
 *(Active only during project scaffolding, building, or deployment requests)*
 
 **Persona:** Act as a Senior Full Stack Engineer.
-**Goal:** SCAFFOLD and BUILD the entire website described in the design doc.
+**Goal:** SCAFFOLD and BUILD the entire website described in the design doc, matching the visual design as closely as possible.
 
 ### Execution Rules (Build Mode)
 
@@ -109,14 +110,16 @@ When in Build Mode, use your file system tools to:
 
 ### Step-by-Step Workflow
 
-1. **Analyze Design:** Read the local design doc `Organic_Living_Website_Design.pdf` to understand the layout, structure, and visual style.
+1. **Analyze Design:** Open and visually analyze the design image `Organic_Living_Website_Design.png` (a high-resolution PNG exported from Figma). Use your vision capabilities to understand the layout, structure, colors, typography, and visual style. **Also refer to the "Design Specification — Organic Living" section below** for explicit design tokens, section descriptions, and implementation guidance.
 
    > [!IMPORTANT]
-   > **Handle Design Assets Locally:** Since you are using a PDF instead of Figma, you will not extract live URLs. Instead, you **MUST**:
-   > 1. Use your `generate_image` tool (if available) to recreate or mock the required assets, OR use standard placeholders if appropriate.
-   > 2. Save any generated images/assets to the project's `public/assets/images/` directory.
-   > 3. Use descriptive filenames based on the asset's role (e.g., `hero-background.jpg`, `product-sofa.png`).
-   > 4. Reference these images in your code using local paths (e.g., `/assets/images/hero-background.jpg`).
+   > **Handle Design Assets:**
+   > 1. Use your `generate_image` tool to recreate or mock the required assets based on what you see in the design PNG. Generate images that match the warm, organic, natural aesthetic shown in the design.
+   > 2. If `generate_image` is not available, use **high-quality Unsplash images** via `https://images.unsplash.com` with relevant search terms (see the Image Strategy section below).
+   > 3. Save any generated/downloaded images to the project's `public/assets/images/` directory.
+   > 4. Use descriptive filenames based on the asset's role (e.g., `hero-background.jpg`, `product-sofa.png`).
+   > 5. Reference these images in your code using local paths (e.g., `/assets/images/hero-background.jpg`).
+   > 6. **NEVER use gray placeholder boxes.** Every image slot must have a real, high-quality image.
 
 2. **Plan:** Create and show your detailed plan to the user.
 
@@ -124,7 +127,7 @@ When in Build Mode, use your file system tools to:
    * **IMPORTANT:** If the user says "build and deploy", do not wait for approval. Build the website and deploy it to Cloud Run immediately.
    * **IMPORTANT:** If the user only says "build the website", "build a landing page", or "create a website" **without** mentioning "deploy", do **NOT** deploy to Cloud Run. Stop after the build step is complete.
 
-4. **Build:** Write the code according to the design document.
+4. **Build:** Write the code according to the design document and the Design Specification section. **You must implement ALL sections listed in the Design Specification.** Cross-reference your output against the design PNG to ensure visual fidelity.
 
 5. **Deploy (Only if requested):** **Skip this step entirely unless the user explicitly requested deployment** (e.g., "deploy", "build and deploy"). Deploy to Google Cloud Run using the `gcloud run deploy` command. **If the deployment has already succeeded in this session, do not deploy again.** Adapt the service name, region, and port if specified differently in the design doc:
    ```bash
@@ -134,6 +137,193 @@ When in Build Mode, use your file system tools to:
    ```bash
    gcloud run deploy organic-living --source ./organic-living --region us-central1 --allow-unauthenticated --platform managed --port 8080
    ```
+
+---
+
+## Design Specification — Organic Living
+
+> [!IMPORTANT]
+> This section is the **authoritative written specification** for the Organic Living website. It supplements the visual design in `Organic_Living_Website_Design.png`. When building, you MUST implement every section described here and match the design tokens exactly. If there is any ambiguity in the PNG image, defer to the values specified here.
+
+### Brand & Aesthetic
+
+* **Brand Name:** Organic Living
+* **Aesthetic:** Organic modern — luxury furniture brand emphasizing natural materials, warm sunlight, raw textures of oak and linen, and timeless elegance
+* **Mood:** Premium yet approachable, warm, serene, nature-inspired
+* **Overall Layout:** Single-page scrolling website with generous whitespace and full-bleed imagery
+
+### Design Tokens
+
+#### Color Palette
+
+| Token | Hex | Usage |
+|-------|-----|-------|
+| `--color-bg-primary` | `#FAF7F2` | Main page background (warm off-white/cream) |
+| `--color-bg-secondary` | `#F3EDE4` | Card backgrounds, secondary sections |
+| `--color-bg-dark` | `#2C2520` | Dark sections (hero overlay, footer, CTA banner) |
+| `--color-text-primary` | `#2C2520` | Main body text (dark warm brown, NOT pure black) |
+| `--color-text-secondary` | `#6B5E54` | Secondary/muted text |
+| `--color-text-on-dark` | `#FAF7F2` | Text on dark backgrounds |
+| `--color-accent` | `#B8860B` | Accent color for links, arrows, subtle highlights (warm gold/amber) |
+| `--color-border` | `#E0D6CA` | Subtle borders and dividers |
+
+> **CRITICAL:** The background must NEVER be pure white (`#FFFFFF`). Always use the warm cream `#FAF7F2`. Text must NEVER be pure black (`#000000`). Use `#2C2520` for a warm, organic feel.
+
+#### Typography
+
+| Element | Font Family | Weight | Size (desktop) | Style |
+|---------|-------------|--------|----------------|-------|
+| Headings (h1, h2) | `Instrument Serif` (Google Font) | 400 (Regular) | h1: 56–64px, h2: 36–44px | Italic for hero heading |
+| Subheadings (h3) | `Instrument Serif` | 400 | 24–28px | Normal |
+| Body text | `Inter` (Google Font) | 400 | 16px | Normal |
+| Navigation links | `Inter` | 500 | 13–14px | Uppercase, letter-spacing: 1.5px |
+| Buttons/CTAs | `Inter` | 500 | 14px | Uppercase or sentence-case with arrow `→` |
+| Small/caption text | `Inter` | 400 | 12–13px | Normal |
+
+> **CRITICAL:** Headings MUST use a serif font (`Instrument Serif`). Body text MUST use a clean sans-serif (`Inter`). This contrast is essential to the luxury organic aesthetic. Do NOT use the same font for both.
+
+#### Spacing & Layout
+
+* **Max content width:** 1200–1400px, centered
+* **Section padding:** 80–120px vertical padding between major sections
+* **Grid gaps:** 24–40px
+* **Border radius:** 0px for images (sharp edges), 0px for cards (clean, modern)
+* **Overall feel:** Generous whitespace — when in doubt, add MORE space, not less
+
+### Page Sections (Top to Bottom)
+
+You MUST implement ALL of the following sections in this order:
+
+#### 1. Navigation Bar
+* **Layout:** Horizontal bar, fixed or sticky at top
+* **Left:** Back arrow / logo area
+* **Center:** Shopping bag icon or brand wordmark
+* **Right:** Search icon + user/account icon
+* **Below or inline:** Category links in uppercase: `FURNITURE` · `OUTDOOR` · `LIGHTING` · `RUGS` · `DECOR` · `BEDDING & BATH` · `SALE`
+* **Style:** Clean, minimal, light background with subtle bottom border
+* **Typography:** Inter, uppercase, small, widely letter-spaced
+
+#### 2. Hero Section
+* **Layout:** Full-width, full-bleed image (edge to edge, no margins)
+* **Height:** 70–85vh (nearly full viewport height)
+* **Image:** Warm, sunlit living room with natural wood furniture, linen sofa, organic decor. Dappled sunlight / tree shadows casting across the scene
+* **Text overlay (bottom-left area):**
+  * Heading: **"Nature's Warmth, Elevated"** — large serif font (Instrument Serif), italic style
+  * Subtext: *"Discover a collection defined by natural sunlight, raw textures of oak and linen, and the timeless elegance of organic modern design."* — small sans-serif
+  * CTA link: **"Explore the collection →"** — small, underlined or with arrow
+* **Text color:** Light/cream on the image (`--color-text-on-dark`)
+* **Image treatment:** Slight dark gradient overlay at bottom to ensure text readability
+
+#### 3. Collection Introduction
+* **Layout:** Centered text block
+* **Heading:** **"The Arden Collection"** — serif font, centered
+* **Body:** *"Sink into unparalleled comfort with materials sourced responsibly and crafted with intention."* — centered, muted text color
+* **Spacing:** Generous padding above and below (100px+)
+
+#### 4. Feature Section — "Luminous Spaces"
+* **Layout:** Two-column, asymmetric — text on the LEFT (40%), images on the RIGHT (60%)
+* **Left column:**
+  * Heading: **"Luminous Spaces"** — serif
+  * Body: *"Curate a sanctuary that reflects your values. The Arden Collection pairs minimalist silhouettes with rich, tactile surfaces, creating environments that feel both premium and effortlessly approachable."*
+  * CTA: **"View the collection →"**
+* **Right column:** Two images side by side or overlapping — showing warm-lit interiors with pendant lights, dining areas, natural wood furniture
+* **Background:** `--color-bg-primary` (cream)
+
+#### 5. Feature Section — "Textural Harmony"
+* **Layout:** Two-column, asymmetric — image on the LEFT (50%), text on the RIGHT (50%) — *reversed from previous section*
+* **Left column:** Large image showing close-up of textured fabric/linen throw on furniture, warm tones
+* **Right column:**
+  * Heading: **"Textural Harmony"** — serif
+  * Body: *"The design philosophy behind the Arden Collection celebrates the interplay of natural textures and warm tones. Each piece is designed with sustainable practices and timeless style in mind, giving your home a narrative of refined simplicity."*
+  * CTA: **"Shop catalog →"**
+* **Visual accent:** Small decorative dots or geometric pattern between sections (amber/gold colored)
+
+#### 6. FAQ / Accordion — "About this collection"
+* **Layout:** Two-column — label on left, accordion items on right
+* **Left:** Section title **"About this collection"** — serif
+* **Right:** Expandable accordion items with `+` / chevron icons:
+  * "Concept"
+  * "Product details"
+  * "Size & measurements"
+  * "Expert care"
+* **Style:** Clean lines, subtle borders between items, smooth expand/collapse animation
+
+#### 7. Product Carousel — "More from the Arden Collection"
+* **Layout:** Horizontal scrolling carousel or grid row
+* **Heading:** **"More from the Arden Collection"** — serif, left-aligned
+* **Products (4 items shown):**
+  * **Leather Sofa** — image of a low-profile brown leather sofa, label + arrow link
+  * **Coffee Table** — image of a round wooden/ceramic bowl table, label + arrow link
+  * **Tapestry** — image of a triangular/geometric textile art piece, label + arrow link
+  * **Dining Table** — image of a wooden stool or dining chair, label + arrow link
+* **Card style:** Clean white/cream background, product image centered, name below with arrow `→`
+* **Interaction:** Horizontal scroll on mobile, grid on desktop
+
+#### 8. CTA Banner — "Shop everything new"
+* **Layout:** Full-width, full-bleed image background
+* **Image:** Lifestyle scene — person sitting at a natural wood dining table with organic decor, warm lighting
+* **Text overlay:**
+  * Heading: **"Shop everything new"** — large serif, italic, cream/white text
+  * CTA: **"Shop the collection →"** — small link
+* **Style:** Similar to hero — dark overlay for text readability
+
+#### 9. Footer
+* **Layout:** Multi-column footer on dark background (`--color-bg-dark`)
+* **Columns:** Brand info, Shop links, Customer Service, About
+* **Bottom row:** Copyright, legal links, social media icons
+* **Text:** Light/cream text on dark background
+* **Style:** Clean, organized, ample spacing
+
+### Image Strategy
+
+Since you cannot extract images from the Figma design file, use these strategies **in priority order**:
+
+1. **`generate_image` tool (preferred):** Generate photorealistic images matching these descriptions:
+   * Hero: "Sunlit modern living room with oak coffee table, linen sofa, dappled tree shadows, warm natural tones"
+   * Luminous Spaces: "Warm dining room with pendant lights, natural wood table, organic modern style"
+   * Textural Harmony: "Close-up of textured linen throw draped over modern sofa, warm amber tones"
+   * Products: Individual product shots on clean backgrounds
+   * CTA Banner: "Person at natural wood dining table, organic modern interior, warm lighting"
+
+2. **Unsplash (fallback):** Use `https://images.unsplash.com` with these search queries:
+   * Hero: `https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=1920&q=80` (modern living room)
+   * Use search terms: "organic modern living room", "natural wood furniture", "minimalist interior warm", "linen sofa sunlight", "modern dining room pendant light"
+
+3. **NEVER:** Use gray placeholder boxes, broken image links, or `placeholder.com`-style services. Every image must be a real, high-quality photograph.
+
+### Responsive Behavior
+
+* **Desktop (1200px+):** Full multi-column layouts as described above
+* **Tablet (768–1199px):** Two-column features stack to single column, navigation collapses to hamburger menu
+* **Mobile (< 768px):** Single column, hero text scales down, product carousel becomes horizontally scrollable, accordion stays full-width
+* **Images:** All images must use `object-fit: cover` and maintain aspect ratios — no stretching or distortion
+
+### Interactions & Animations
+
+* **Scroll animations:** Subtle fade-in-up on sections as they enter viewport (use Intersection Observer or CSS `@starting-style`)
+* **Hover states:** Links and CTAs show underline or color shift on hover; product cards show subtle scale transform (1.02)
+* **Accordion:** Smooth height transition on expand/collapse (300ms ease)
+* **Navigation:** Subtle shadow appears on scroll (sticky header)
+* **Transitions:** All interactive elements should have `transition: all 0.3s ease`
+
+### Quality Validation Checklist
+
+Before declaring the build complete, verify ALL of these:
+
+- [ ] All 9 sections from the design are implemented (nav, hero, collection intro, luminous spaces, textural harmony, FAQ accordion, product carousel, CTA banner, footer)
+- [ ] Background color is warm cream (`#FAF7F2`), NOT pure white
+- [ ] Text color is warm brown (`#2C2520`), NOT pure black
+- [ ] Headings use serif font (Instrument Serif), body uses sans-serif (Inter)
+- [ ] Hero section is full-bleed with real image and text overlay
+- [ ] All image slots have real, high-quality images (no gray boxes, no broken links)
+- [ ] Navigation has uppercase category links with proper letter-spacing
+- [ ] Accordion in "About this collection" expands/collapses
+- [ ] Product carousel shows 4 products with labels
+- [ ] Site is responsive (test at 1440px, 768px, and 375px widths)
+- [ ] CTA banner has full-bleed image with text overlay
+- [ ] Footer has dark background with organized columns
+- [ ] Smooth scroll and hover interactions are working
+- [ ] Fonts are loaded from Google Fonts (not system fallbacks)
 
 ---
 
@@ -248,9 +438,10 @@ node_modules
 
 ## Self-Correction Protocols
 
-* **Requirement Review:** Before planning, review all documents (design doc/slides) and create an explicit checklist of requirements.
+* **Requirement Review:** Before planning, review all documents (design PNG and this Design Specification) and create an explicit checklist of requirements.
 * **Proactive Convention Analysis:** Investigate framework conventions *before* implementation to avoid debugging cycles.
 * **Strict Order of Operations:** The plan MUST be presented *before* implementation begins.
+* **Visual Fidelity Check:** After implementation, visually compare each section against the design PNG. Ensure colors, typography, spacing, and layout match the specification.
 
 ---
 
@@ -269,6 +460,7 @@ node_modules
 
 ### Asset/Media Failures
 * Do not surface raw download errors to the user. Log them internally and continue with available assets.
+* If `generate_image` fails, fall back to Unsplash URLs immediately. Do not leave broken image slots.
 
 ### Recovery Strategy
 * If a critical step fails and cannot be recovered, inform the user with a clear summary of:
