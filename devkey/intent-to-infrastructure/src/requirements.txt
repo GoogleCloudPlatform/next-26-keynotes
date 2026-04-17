@@ -1,0 +1,9 @@
+Flask==3.0.0
+requests==2.31.0
+gunicorn==21.2.0
+google-cloud-aiplatform>=1.38.0
+opentelemetry-distro
+opentelemetry-exporter-gcp-trace
+opentelemetry-exporter-otlp
+opentelemetry-instrumentation-flask
+opentelemetry-instrumentation-requests

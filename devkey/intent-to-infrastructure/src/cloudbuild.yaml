@@ -1,0 +1,15 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}'
+      - '.' # Build from the current directory (src)
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}'
+
+images:
+  - '${_LOCATION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY_ID}/${_IMAGE_NAME}:${_IMAGE_TAG}'

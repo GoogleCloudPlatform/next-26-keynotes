@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ display_model_name }} Chat - Hypercomputer (v{{ app_version }})</title>
+    <style>
+        body { font-family: sans-serif; height: 100vh; margin: 0; background-color: #f4f4f9; display: flex; justify-content: center; align-items: center; }
+        
+        #main-wrapper {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #chat-container { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 60px 20px 20px 20px; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 15px; 
+        }
+
+        .message { max-width: 75%; padding: 12px 18px; border-radius: 18px; line-height: 1.5; font-size: 15px; }
+        .user-message { align-self: flex-end; background-color: #007bff; color: white; border-bottom-right-radius: 4px; }
+        .bot-message { align-self: flex-start; background-color: #f1f3f5; color: #212529; border-bottom-left-radius: 4px; }
+        
+        #input-area { 
+            padding: 20px; 
+            background: #f8f9fa; 
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .input-group {
+            flex: 1;
+            display: flex;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            overflow: hidden;
+            background: white;
+        }
+
+        input { 
+            flex: 1; 
+            padding: 12px 15px; 
+            border: none; 
+            font-size: 16px; 
+            outline: none;
+        }
+
+        button#send-btn { 
+            padding: 0 25px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            cursor: pointer; 
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        button#send-btn:hover { background-color: #0056b3; }
+        button#send-btn:disabled { background-color: #ccc; cursor: not-allowed; }
+
+        .arch-btn {
+            background-color: #343a40;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: background 0.2s;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .arch-btn:hover { background-color: #23272b; }
+
+        #system-status-card {
+            position: absolute;
+            bottom: 120px;
+            right: 20px;
+            width: 320px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(233, 236, 239, 0.7);
+            z-index: 100;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            transition: background-color 0.3s;
+        }
+
+        #status-header {
+            padding: 12px 15px;
+            background-color: rgba(255, 255, 255, 0.5); 
+            color: #343a40;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        #status-header:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        #status-content {
+            padding: 15px;
+            display: block;
+        }
+        
+        #status-content.hidden {
+            display: none;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        
+        .info-row:last-child { margin-bottom: 0; }
+        
+        .info-label {
+            font-weight: bold;
+            color: #6c757d;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #212529;
+            text-align: right;
+        }
+        
+        .toggle-icon {
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div id="main-wrapper">
+        <div id="system-status-card">
+            <div id="status-header" onclick="toggleStatus()">
+                <span>Hypercomputer</span>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div id="status-content">
+                <div class="info-row">
+                    <span class="info-label">Model</span>
+                    <span class="info-value">{{ display_model_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">App Version</span>
+                    <span class="info-value">{{ app_version }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">GPU</span>
+                    <span class="info-value">{{ gpu_type }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Node</span>
+                    <span class="info-value" title="{{ node_name }}">{{ node_name|truncate(12, True) }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div id="chat-container">
+            <div class="message bot-message">Hello! I am powered by {{ display_model_name }} running on the Hypercomputer. How can I help you?</div>
+        </div>
+        
+        <div id="input-area">
+            <div class="input-group">
+                <input type="text" id="user-input" placeholder="Type a message..." onkeydown="if(event.key==='Enter') sendMessage()">
+                <button onclick="sendMessage()" id="send-btn">Send</button>
+            </div>
+            <button onclick="resetChat()" class="arch-btn" style="border:none; cursor:pointer;">New Chat</button>
+            <a href="/architecture" class="arch-btn">Architecture</a>
+        </div>
+    </div>
+
+    <script>
+        let currentSessionId = null;
+
+        function resetChat() {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = '<div class="message bot-message">Hello! I am powered by {{ display_model_name }} running on the Hypercomputer. How can I help you?</div>';
+            currentSessionId = null;
+        }
+
+        function toggleStatus() {
+            const content = document.getElementById('status-content');
+            const icon = document.querySelector('.toggle-icon');
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.style.transform = 'rotate(0deg)';
+            } else {
+                content.classList.add('hidden');
+                icon.style.transform = 'rotate(-90deg)';
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('user-input');
+            const button = document.getElementById('send-btn');
+            const container = document.getElementById('chat-container');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            container.innerHTML += `<div class="message user-message">${escapeHtml(message)}</div>`;
+            input.value = '';
+            input.disabled = true;
+            button.disabled = true;
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const payload = { message };
+                if (currentSessionId) {
+                    payload.session_id = currentSessionId;
+                }
+
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (data.session_id) {
+                    currentSessionId = data.session_id;
+                }
+                
+                if (data.error) {
+                    container.innerHTML += `<div class="message bot-message" style="color:red">Error: ${data.error}</div>`;
+                } else {
+                    container.innerHTML += `<div class="message bot-message">${escapeHtml(data.response)}</div>`;
+                }
+            } catch (e) {
+                container.innerHTML += `<div class="message bot-message" style="color:red">Network Error</div>`;
+            }
+
+            input.disabled = false;
+            button.disabled = false;
+            input.focus();
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+    </script>
+</body>
+</html>
