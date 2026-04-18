@@ -90,7 +90,7 @@ build-inspector-if-needed:
 # ==============================================================================
 
 # Secrets that should be stored in Secret Manager (not as plain-text env vars)
-SECRET_KEYS := GOOGLE_CHAT_WEBHOOK_URL JIRA_API_TOKEN GCP_API_KEY
+SECRET_KEYS := GOOGLE_CHAT_WEBHOOK_URL JIRA_API_TOKEN
 
 # Create or update secrets in Secret Manager from local .env values (one-time setup)
 create-secrets:
@@ -144,20 +144,32 @@ grant-secret-access:
 deploy:
 	PROJECT_ID=$$(gcloud config get-value project) && \
 	PROJECT_NUMBER=$$(gcloud projects describe $$PROJECT_ID --format="value(projectNumber)") && \
-	ENV_VARS=$$(if [ -f .env ]; then awk -F= '!/^#/ && NF && $$1!="GOOGLE_CHAT_WEBHOOK_URL" && $$1!="JIRA_API_TOKEN" && $$1!="GCP_API_KEY" { key=$$1; val=$$2; for(i=3; i<=NF; i++) val=val"="$$i; gsub(/^"|"$$/, "", val); gsub(/^'\''|'\''$$/, "", val); printf "~%s=%s", key, val; }' .env; fi) && \
+	ENV_VARS=$$(if [ -f .env ]; then awk -F= '!/^#/ && NF && $$1!="GOOGLE_CHAT_WEBHOOK_URL" && $$1!="JIRA_API_TOKEN" { key=$$1; val=$$2; for(i=3; i<=NF; i++) val=val"="$$i; gsub(/^"|"$$/, "", val); gsub(/^'\''|'\''$$/, "", val); printf "~%s=%s", key, val; }' .env; fi) && \
+	SECRETS="" && \
+	if [ -f .env ] && ! grep -q "^SKIP_JIRA=true" .env; then \
+		SECRETS="JIRA_API_TOKEN=JIRA_API_TOKEN:latest"; \
+	fi && \
+	if [ -f .env ] && ! grep -q "^SKIP_CHAT=true" .env; then \
+		if [ -n "$$SECRETS" ]; then SECRETS="GOOGLE_CHAT_WEBHOOK_URL=GOOGLE_CHAT_WEBHOOK_URL:latest,$$SECRETS"; else SECRETS="GOOGLE_CHAT_WEBHOOK_URL=GOOGLE_CHAT_WEBHOOK_URL:latest"; fi; \
+	fi && \
+	SECRETS_FLAG="" && \
+	if [ -n "$$SECRETS" ]; then \
+		SECRETS_FLAG="--set-secrets=$$SECRETS"; \
+	else \
+		SECRETS_FLAG="--clear-secrets"; \
+	fi && \
 	gcloud beta run deploy dev-agent \
 		--source . \
-		--memory "8Gi" \
+		--memory 8Gi \
 		--cpu 2 \
 		--project $$PROJECT_ID \
-		--region "us-central1" \
+		--region us-central1 \
 		--no-allow-unauthenticated \
 		--no-cpu-throttling \
 		--max-instances=1 \
-		--labels "created-by=adk" \
-		--update-env-vars \
-		"^~^APP_URL=https://dev-agent-$$PROJECT_NUMBER.us-central1.run.app~AGENT_VERSION=$(shell awk -F'"' '/^version = / {print $$2}' pyproject.toml || echo '1.0.0')$${ENV_VARS}" \
-		--update-secrets="GOOGLE_CHAT_WEBHOOK_URL=GOOGLE_CHAT_WEBHOOK_URL:latest,JIRA_API_TOKEN=JIRA_API_TOKEN:latest,GCP_API_KEY=GCP_API_KEY:latest" \
+		--labels created-by=adk \
+		--update-env-vars "^~^APP_URL=https://dev-agent-$$PROJECT_NUMBER.us-central1.run.app~AGENT_VERSION=$(shell awk -F'\"' '/^version = / {print $$2}' pyproject.toml || echo '1.0.0')$${ENV_VARS}" \
+		$$SECRETS_FLAG \
 		$(if $(IAP),--iap) \
 		$(if $(PORT),--port=$(PORT))
 
