@@ -45,6 +45,10 @@ _PROMPTS_DIR = Path(__file__).parent / "prompts"
 # When True, Jira is replaced by a lightweight GCS-based task system.
 SKIP_JIRA = os.getenv("SKIP_JIRA", "false").lower() == "true"
 
+# When True, Google Chat notifications are skipped.
+SKIP_CHAT = os.getenv("SKIP_CHAT", "false").lower() == "true"
+
+
 # GCS bucket used for task JSON files and video assets.
 _TASK_BUCKET = os.getenv("ASSET_BUCKET_NAME", "")
 _TASK_PREFIX = "tasks/"
@@ -201,6 +205,9 @@ async def send_google_chat_message(message_text: str) -> str:
     Returns:
         A confirmation message indicating whether the send was successful.
     """
+    if SKIP_CHAT:
+        return "ℹ️ Chat notification skipped because SKIP_CHAT is enabled."
+
     webhook_url = os.getenv("GOOGLE_CHAT_WEBHOOK_URL")
     if not webhook_url:
         return (

@@ -71,6 +71,7 @@ Copy `.env.sample` to `.env` and fill in the values:
 | Variable | Description |
 |----------|-------------|
 | `SKIP_JIRA` | Set to `"true"` to skip Jira and use a lightweight GCS-based task system instead. Defaults to `"false"`. |
+| `SKIP_CHAT` | Set to `"true"` to skip sending Google Chat notifications. Defaults to `"false"`. |
 | `ADK_MODEL` | The Gemini model to use (e.g. `gemini-3-flash-preview`). |
 | `GOOGLE_CLOUD_PROJECT` | Your GCP project ID. |
 | `GOOGLE_CLOUD_LOCATION` | GCP region (e.g. `global`). |
@@ -78,7 +79,7 @@ Copy `.env.sample` to `.env` and fill in the values:
 | `JIRA_BASE_URL` | Jira Cloud base URL (e.g. `https://your-org.atlassian.net`). Not needed when `SKIP_JIRA=true`. |
 | `JIRA_USER_EMAIL` | Jira user email for API auth and ticket assignment. |
 | `JIRA_API_TOKEN` | Jira API token (secret). |
-| `GOOGLE_CHAT_WEBHOOK_URL` | Google Chat webhook URL for notifications (secret). |
+| `GOOGLE_CHAT_WEBHOOK_URL` | Google Chat webhook URL for notifications (secret). Not needed when `SKIP_CHAT=true`. |
 
 ### SKIP_JIRA Mode
 
