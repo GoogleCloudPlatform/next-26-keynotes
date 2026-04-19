@@ -16,8 +16,5 @@ AGENT_DESCRIPTION = (
     "decision with blockers and recommendations."
 )
 
-# Model configuration
-MODEL = os.getenv("SIMULATOR_MODEL", "gemini-3-flash-preview")
-
 # Structured output schema
 OUTPUT_SCHEMA = SimulationApproval
