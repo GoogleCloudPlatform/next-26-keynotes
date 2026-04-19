@@ -12,16 +12,19 @@ from google.genai import Client, types
 from google.adk.agents import LlmAgent
 from google.adk.skills import load_skill_from_dir
 from google.adk.tools.skill_toolset import SkillToolset
-from .config import AGENT_NAME, MODEL, OUTPUT_SCHEMA
+from .config import AGENT_NAME, OUTPUT_SCHEMA
 from .prompts import INSTRUCTION, COMPACTION_PROMPT_TEMPLATE
 from .tools import get_tools
 from google.adk.apps.app import EventsCompactionConfig
 from google.adk.apps.llm_event_summarizer import LlmEventSummarizer
 from google.adk.events.event import Event
+import time
 
 # read .env
 import os
 from dotenv import load_dotenv
+
+MODEL = "gemini-2.5-flash"
 
 load_dotenv()
 # verify env vars are loaded
@@ -109,12 +112,19 @@ class Gemini3(Gemini):
 
 
 # Note - downgraded to Gemini 2.5 to avoid unexpected capacity issues with Gemini 3
-llm = Gemini3(model="gemini-2.5-flash")
+llm = Gemini3(model=MODEL)
 
 
 # Define a custom summarizer that can "see" into the JSON tool response (vs. just raw text by default)
 class ToolAwareSummarizer(LlmEventSummarizer):
     def _format_events_for_prompt(self, events: list[Event]) -> str:
+        print(
+            f"\n[🗜️ COMPACTION TRIGGERED] Formatting {len(events)} events for summarization..."
+        )
+        print(
+            "[💤 DEMO DELAY] Sleeping for 30 seconds to reset Vertex TPM quota before the summarizer LLM call..."
+        )
+        time.sleep(30)
         formatted_history = []
         for event in events:
             if event.content and event.content.parts:
@@ -165,5 +175,7 @@ app = App(
         compaction_interval=3,
         overlap_size=1,
         summarizer=summarizer,
+        token_threshold=200000,
+        event_retention_size=2,
     ),
 )
