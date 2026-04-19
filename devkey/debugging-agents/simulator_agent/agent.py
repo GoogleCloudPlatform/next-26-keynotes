@@ -175,7 +175,5 @@ app = App(
         compaction_interval=3,
         overlap_size=1,
         summarizer=summarizer,
-        token_threshold=200000,
-        event_retention_size=2,
     ),
 )
