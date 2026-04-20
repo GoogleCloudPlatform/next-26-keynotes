@@ -75,7 +75,9 @@ Copy `.env.sample` to `.env` and fill in the values:
 | `ADK_MODEL` | The Gemini model to use (e.g. `gemini-3-flash-preview`). |
 | `GOOGLE_CLOUD_PROJECT` | Your GCP project ID. |
 | `GOOGLE_CLOUD_LOCATION` | GCP region (e.g. `global`). |
-| `ASSET_BUCKET_NAME` | GCS bucket for task JSON files and video assets. |
+| `ASSET_BUCKET_NAME` | GCS bucket for task JSON files. |
+| `VEO_GCS_BUCKET` | GCS bucket for campaign videos. |
+| `LOGS_BUCKET_NAME` | GCS bucket for telemetry and GenAI logs. |
 | `JIRA_BASE_URL` | Jira Cloud base URL (e.g. `https://your-org.atlassian.net`). Not needed when `SKIP_JIRA=true`. |
 | `JIRA_USER_EMAIL` | Jira user email for API auth and ticket assignment. |
 | `JIRA_API_TOKEN` | Jira API token (secret). |
@@ -88,7 +90,7 @@ When `SKIP_JIRA="true"`, the agent replaces all Jira operations with a GCS-based
 - **Create task**: Generates a unique task ID (e.g. `TASK-a3f7b2c1`), extracts video URLs from the description, and uploads a JSON file to `gs://{ASSET_BUCKET_NAME}/tasks/{task_id}.json`.
 - **Get task**: Downloads the task JSON from GCS and displays all details including video URLs.
 - **Start task**: Updates the task JSON with status "In Progress", assignee, and start date.
-- **Get videos**: Retrieves video URLs from the task JSON. Falls back to listing the latest 3 videos from the `videos/` prefix in the GCS bucket.
+- **Get videos**: Retrieves video URLs from the task JSON. Falls back to listing videos from the bucket specified by `VEO_GCS_BUCKET`.
 
 Chat notifications use the task ID instead of Jira ticket keys, and no Jira info is shown.
 

@@ -58,6 +58,20 @@ For full command options and usage, refer to the [Makefile](Makefile).
 | `uvx agent-starter-pack upgrade` | Auto-upgrade to latest version while preserving customizations |
 | `uvx agent-starter-pack extract` | Extract minimal, shareable version of your agent |
 
+## Configuration
+
+### Environment Variables
+
+Copy `.env.sample` to `.env` and fill in the values:
+
+| Variable | Description |
+|----------|-------------|
+| `ADK_MODEL` | The Gemini model to use (e.g. `gemini-3-flash-preview`). |
+| `SIGNED_URL_EXPIRATION_MINUTES` | Expiration time for signed URLs (default: `60`). |
+| `VEO_GCS_BUCKET` | GCS bucket for campaign videos. |
+| `GOOGLE_DRIVE_FOLDER_ID` | Google Drive folder ID for assets. |
+| `LOGS_BUCKET_NAME` | GCS bucket for telemetry and GenAI logs. |
+
 ---
 
 ## Development

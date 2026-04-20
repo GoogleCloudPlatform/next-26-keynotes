@@ -74,6 +74,7 @@ Copy `.env.sample` to `.env` and fill in the values:
 | `GOOGLE_CLOUD_PROJECT` | Your Google Cloud project ID (auto-detected from ADC if unset) |
 | `GOOGLE_CLOUD_LOCATION` | API location (default: `global`) |
 | `GEMINI_API_KEY` | AI Studio API key for the Deep Research Interactions API ([get one here](https://aistudio.google.com/apikey)) |
+| `LOGS_BUCKET_NAME` | GCS bucket for telemetry and GenAI logs. |
 
 ## Architecture
 
