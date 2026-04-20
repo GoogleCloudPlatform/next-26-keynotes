@@ -51,7 +51,7 @@ SKIP_CHAT = os.getenv("SKIP_CHAT", "false").lower() == "true"
 
 # GCS bucket used for task JSON files and video assets.
 _TASK_BUCKET = os.getenv("ASSET_BUCKET_NAME", "")
-_VIDEO_BUCKET = os.getenv("VIDEO_BUCKET_NAME", _TASK_BUCKET)
+_VIDEO_BUCKET = os.getenv("VEO_GCS_BUCKET", _TASK_BUCKET)
 _TASK_PREFIX = "tasks/"
 
 
