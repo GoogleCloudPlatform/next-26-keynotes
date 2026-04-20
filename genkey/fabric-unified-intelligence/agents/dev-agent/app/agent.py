@@ -51,6 +51,7 @@ SKIP_CHAT = os.getenv("SKIP_CHAT", "false").lower() == "true"
 
 # GCS bucket used for task JSON files and video assets.
 _TASK_BUCKET = os.getenv("ASSET_BUCKET_NAME", "")
+_VIDEO_BUCKET = os.getenv("VIDEO_BUCKET_NAME", _TASK_BUCKET)
 _TASK_PREFIX = "tasks/"
 
 
@@ -303,10 +304,10 @@ def get_campaign_videos(
 
     # Fallback: list the latest 3 video files from the GCS bucket directly.
     # This supports the Jira flow where no task JSON exists yet.
-    if _TASK_BUCKET:
+    if _VIDEO_BUCKET:
         try:
             client = _get_gcs_client()
-            bucket = client.bucket(_TASK_BUCKET)
+            bucket = client.bucket(_VIDEO_BUCKET)
             blobs = list(bucket.list_blobs(prefix="videos/"))
             video_extensions = (".mp4", ".webm", ".mov", ".avi")
             video_blobs = [
