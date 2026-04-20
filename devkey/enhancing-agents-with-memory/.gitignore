@@ -1,0 +1,88 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# uv
+.venv/
+uv.lock
+
+# ADK specific
+.adk/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Linting
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.idea/
+.vscode/
+*.sublime-*
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Project documentation (reference)
+docs/
+
+# Local scripts
+init-vibe.sh
+
+# GitHub templates
+.github/
+
+# Retired code (old orchestrator, etc.)
+src/_retired/
+
+# Internal planning documents
+plans/
+
+# Terraform
+*.tfstate
+*.tfstate.*
+*.tfvars
+.terraform/
+.terraform.lock.hcl
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# RFC docs (internal planning)
+RFC_*.md
+
+# Terraform plan files
+tfplan
+
+# Git worktrees
+.worktrees/

@@ -1,0 +1,11 @@
+[project]
+name = "enhancing-agents-with-memory"
+version = "0.1.0"
+description = "Enhancing ADK agents with Session Management, Memory Bank, and AlloyDB RAG"
+requires-python = ">=3.11"
+dependencies = [
+    "google-adk>=1.31.0",
+    "google-cloud-aiplatform>=1.148.0",
+    "mcp>=1.27.0",
+    "python-dotenv>=1.2.2",
+]
