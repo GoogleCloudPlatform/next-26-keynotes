@@ -18,6 +18,7 @@ variable "vllm_image" {}
 variable "gpu_type" {}
 variable "model_bucket_name" {}
 variable "model_reader_sa_email" {}
+variable "agent_sa_email" {}
 
 variable "use_gemini_api" {
   description = "Whether to use the Vertex AI Gemini API instead of vLLM."

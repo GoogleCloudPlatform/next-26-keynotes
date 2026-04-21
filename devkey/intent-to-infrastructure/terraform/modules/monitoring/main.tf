@@ -33,7 +33,7 @@ resource "google_monitoring_dashboard" "hypercomputer_dashboard" {
               }
             },
             {
-              "legendTemplate": "Runner Pods",
+              "legendTemplate": "Agent Pods",
               "minAlignmentPeriod": "60s",
               "plotType": "LINE",
               "targetAxis": "Y1",
