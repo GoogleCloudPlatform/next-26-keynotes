@@ -166,6 +166,18 @@ resource "google_service_account" "model_reader" {
   project      = var.project_id
 }
 
+resource "google_service_account" "agent_sa" {
+  account_id   = "${var.prefix}-agent-sa"
+  display_name = "Agent Service Account for ${var.prefix}"
+  project      = var.project_id
+}
+
+resource "google_project_iam_member" "agent_vertex_user" {
+  project = var.project_id
+  role    = "roles/aiplatform.user"
+  member  = "serviceAccount:${google_service_account.agent_sa.email}"
+}
+
 resource "google_storage_bucket_iam_member" "reader" {
   bucket = google_storage_bucket.models.name
   role   = "roles/storage.objectViewer"

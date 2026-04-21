@@ -5,14 +5,9 @@ resource "google_project_service" "run_api" {
   disable_on_destroy = false
 }
 
-# Create a dedicated service account for the Runner
-resource "google_service_account" "runner_sa" {
-  account_id   = "${var.env_prefix}-runner-sa"
-  display_name = "Runner Agent Service Account for ${var.env_prefix}"
-  project      = var.project_id
-}
 
-resource "google_cloud_run_v2_service" "runner" {
+
+resource "google_cloud_run_v2_service" "agent" {
   name                = "${var.env_prefix}-${var.service_name}"
   location            = var.region
   ingress             = "INGRESS_TRAFFIC_ALL"
@@ -39,7 +34,7 @@ resource "google_cloud_run_v2_service" "runner" {
         value = tostring(var.use_gemini_api)
       }
     }
-    service_account = google_service_account.runner_sa.email
+    service_account = var.agent_sa_email
   }
 
   # Ensure API is enabled before creating the service
@@ -48,15 +43,10 @@ resource "google_cloud_run_v2_service" "runner" {
 
 # Allow unauthenticated invocations
 resource "google_cloud_run_v2_service_iam_member" "public_access" {
-  name     = google_cloud_run_v2_service.runner.name
-  location = google_cloud_run_v2_service.runner.location
+  name     = google_cloud_run_v2_service.agent.name
+  location = google_cloud_run_v2_service.agent.location
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
 
-# Grant Vertex AI User to the dedicated service account
-resource "google_project_iam_member" "vertex_user" {
-  project = var.project_id
-  role    = "roles/aiplatform.user"
-  member  = "serviceAccount:${google_service_account.runner_sa.email}"
-}
+

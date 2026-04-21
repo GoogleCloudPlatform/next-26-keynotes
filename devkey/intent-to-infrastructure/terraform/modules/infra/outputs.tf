@@ -22,6 +22,10 @@ output "model_reader_sa_email" {
   value = google_service_account.model_reader.email
 }
 
+output "agent_sa_email" {
+  value = google_service_account.agent_sa.email
+}
+
 output "model_bucket_url" {
   value = google_storage_bucket.models.url
 }

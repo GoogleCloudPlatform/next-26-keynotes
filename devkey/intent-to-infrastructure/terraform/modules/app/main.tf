@@ -21,6 +21,21 @@ resource "google_service_account_iam_member" "workload_identity_user" {
   member             = "serviceAccount:${var.project_id}.svc.id.goog[default/${kubernetes_service_account.vllm.metadata[0].name}]"
 }
 
+resource "kubernetes_service_account" "agent" {
+  metadata {
+    name = "${var.prefix}-agent-sa"
+    annotations = {
+      "iam.gke.io/gcp-service-account" = var.agent_sa_email
+    }
+  }
+}
+
+resource "google_service_account_iam_member" "agent_workload_identity_user" {
+  service_account_id = "projects/${var.project_id}/serviceAccounts/${var.agent_sa_email}"
+  role               = "roles/iam.workloadIdentityUser"
+  member             = "serviceAccount:${var.project_id}.svc.id.goog[default/${kubernetes_service_account.agent.metadata[0].name}]"
+}
+
 resource "kubernetes_config_map" "otel_collector_conf" {
   count = var.enable_otel ? 1 : 0
 

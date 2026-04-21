@@ -77,6 +77,7 @@ module "app" {
   gpu_type              = module.infra.gpu_type
   model_bucket_name     = module.infra.model_bucket_name
   model_reader_sa_email = module.infra.model_reader_sa_email
+  agent_sa_email        = module.infra.agent_sa_email
 
   use_gemini_api           = var.use_gemini_api
   gemini_model_name        = var.gemini_model_name
@@ -109,6 +110,7 @@ module "cloud_run" {
   service_name = var.cloud_run_service_name
   port         = var.cloud_run_port
   use_gemini_api = var.use_gemini_api
+  agent_sa_email = module.infra.agent_sa_email
 }
 
 

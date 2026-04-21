@@ -17,7 +17,7 @@ variable "image_url" {
 variable "service_name" {
   description = "Name of the Cloud Run service"
   type        = string
-  default     = "runner-agent"
+  default     = "agent"
 }
 
 variable "port" {
@@ -35,4 +35,9 @@ variable "use_gemini_api" {
   description = "Whether to use Gemini API instead of vLLM"
   type        = bool
   default     = true
+}
+
+variable "agent_sa_email" {
+  description = "Email of the service account to run the agent"
+  type        = string
 }
