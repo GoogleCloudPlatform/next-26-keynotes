@@ -15,8 +15,6 @@ gpu_machine_type     = "g2-standard-12"
 gpu_accelerator_type = "nvidia-l4"
 node_locations       = ["asia-southeast1-a", "asia-southeast1-b", "asia-southeast1-c"]
 
-cloud_run_port = 8080
-
 # App Configuration
 app_version         = "v1.10"
 model_name          = "google-gemma-4-E4B-it"
@@ -31,6 +29,7 @@ gemini_model_name   = "gemini-2.5-flash"
 vllm_hpa_target_cpu = 50
 
 enable_inference_gateway = false
+cloud_run_port = 8080
 
 # Storage
 lustre_active      = false
