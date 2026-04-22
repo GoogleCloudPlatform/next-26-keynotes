@@ -31,6 +31,7 @@ gemini_model_name   = "gemini-2.5-flash"
 vllm_hpa_target_cpu = 50
 
 enable_inference_gateway = false
+cloud_run_port = 8080
 
 # Storage
 lustre_active      = false
