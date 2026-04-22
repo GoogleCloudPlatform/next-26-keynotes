@@ -42,6 +42,7 @@ traffic_active    = false
 monitoring_active = true
 app_active        = true    # Enabled so the model download K8s job runs
 create_alerts     = false
+cloud_run_active  = true
 
 # Traffic Configuration (inactive, but set explicitly)
 traffic_multiplier_low  = 0.05
