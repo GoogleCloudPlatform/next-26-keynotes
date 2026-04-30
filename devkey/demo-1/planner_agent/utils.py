@@ -20,20 +20,6 @@ from collections import OrderedDict
 from typing import Awaitable, Callable, Union
 
 from google.adk.agents.readonly_context import ReadonlyContext
-import google.genai
-import os
-
-original_client_init = google.genai.Client.__init__
-
-
-def new_client_init(self, *args, **kwargs):
-    kwargs["vertexai"] = True
-    kwargs["project"] = os.environ.get("GOOGLE_CLOUD_PROJECT", "")
-    kwargs["location"] = "global"
-    original_client_init(self, *args, **kwargs)
-
-
-google.genai.Client.__init__ = new_client_init
 
 # ADK InstructionProvider signature
 InstructionProvider = Union[
