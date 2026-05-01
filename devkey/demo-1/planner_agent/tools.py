@@ -22,6 +22,8 @@ from google.adk.skills import load_skill_from_dir
 from google.adk.integrations.api_registry import ApiRegistry
 from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 from google.adk.tools.skill_toolset import SkillToolset
+from google.adk.tools.mcp_tool import McpToolset
+from google.adk.tools.mcp_tool.mcp_session_manager import StreamableHTTPConnectionParams
 
 logger = logging.getLogger(__name__)
 
@@ -121,12 +123,18 @@ def get_maps_tools() -> list:
         )
         return []
 
-    mcp_server_name = f"projects/{project_id}/locations/global/mcpServers/google-mapstools.googleapis.com-mcp"
-    api_registry = MapsApiRegistry(
-        api_registry_project_id=project_id,
-        header_provider=header_provider,
+    mcpToolset = McpToolset(
+        connection_params=StreamableHTTPConnectionParams(
+            url="https://mapstools.googleapis.com/mcp",
+            headers={
+                "X-Goog-Api-Key": maps_key,
+                "Content-Type": "application/json",
+                "Accept": "application/json, text/event-stream"
+            }
+        )
     )
-    return [api_registry.get_toolset(mcp_server_name=mcp_server_name)]
+
+    return [mcpToolset]
 
 
 def _load_additional_tools(skills_dir: pathlib.Path) -> list:
