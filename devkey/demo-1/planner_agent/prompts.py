@@ -57,7 +57,6 @@ After loading a skill, its tools become available as named tool calls.
 1. `gis-spatial-engineering`: Route tools — `plan_marathon_route`,
    `report_marathon_route`.
 2. `race-director`: Event logistics use to validate generated plans after.
-3. `mapping`: Landmark and weather lookup via Maps MCP tools (no load needed).
 """
 
 TOOLS = """\
